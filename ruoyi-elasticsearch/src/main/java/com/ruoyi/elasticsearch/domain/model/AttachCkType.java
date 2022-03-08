@@ -18,45 +18,52 @@ import lombok.experimental.Accessors;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Accessors(chain = true)
-@TableName("att_header")
+@TableName("att_ck_type")
 @ExcelIgnoreUnannotated
-@ApiModel("att头部")
-public class AttachHeader extends BaseEntity {
+@ApiModel("二级分类表")
+public class AttachCkType extends BaseEntity {
 
     /**
-     * 主键id
+     * 二级id
      */
-    @ApiModelProperty(value = "主键")
-    @ExcelProperty(value = "主键")
-    @TableId(value = "att_id")
+    @ApiModelProperty(value = "二级id")
+    @ExcelProperty(value = "二级id")
+    @TableId(value = "ck_id")
+    private long ckId;
+
+    /**
+     * 头部id
+     */
+    @ApiModelProperty(value = "头部id")
+    @ExcelProperty(value = "头部id")
     private Long attId;
 
     /**
-     * 头部名称
+     * 名称
      */
-    @ApiModelProperty(value = "头部名称")
-    @ExcelProperty(value = "头部名称")
-    private String attName;
+    @ApiModelProperty(value = "名称")
+    @ExcelProperty(value = "名称")
+    private String ckName;
 
     /**
      * 英文名称
-     */
+     * */
     @ApiModelProperty(value = "英文名称")
     @ExcelProperty(value = "英文名称")
-    private String attNameEn;
+    private String ckNameEn;
 
     /**
      * 编码
-     */
+     * */
     @ApiModelProperty(value = "编码")
     @ExcelProperty(value = "编码")
-    private String attCode;
+    private String ckCode;
 
     /**
-     * 状态（1正常 0失败）
-     */
-    @ApiModelProperty(value = "状态（1正常 0失败）")
-    @ExcelProperty(value = "状态（1正常 0失败）")
+     * 执行状态（1正常 0失败）
+     * */
+    @ApiModelProperty(value = "状态")
+    @ExcelProperty(value = "状态 1=正常,0=失败")
     private String status;
 
 }
