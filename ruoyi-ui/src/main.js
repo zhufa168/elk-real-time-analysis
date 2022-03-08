@@ -12,8 +12,9 @@ import '@/views/activiti/bpmn/package/theme/index.scss' //bpmn-process-designer 
 import App from './App'
 import store from './store'
 import router from './router'
-import directive from './directive' //directive
+import directive from './directive' // directive
 import plugins from './plugins' // plugins
+import { download } from '@/utils/request'
 import { vuePlugin } from '@/views/activiti/bpmn/highlight'  // vuePlugin
 import MyPD from "@/views/activiti/bpmn/package/index.js"
 
@@ -36,6 +37,8 @@ import Editor from "@/components/Editor"
 import FileUpload from "@/components/FileUpload"
 // 图片上传组件
 import ImageUpload from "@/components/ImageUpload"
+// 图片预览组件
+import ImagePreview from "@/components/ImagePreview"
 // 字典标签组件
 import DictTag from '@/components/DictTag'
 // 头部标签组件
@@ -51,6 +54,7 @@ Vue.prototype.resetForm = resetForm
 Vue.prototype.addDateRange = addDateRange
 Vue.prototype.selectDictLabel = selectDictLabel
 Vue.prototype.selectDictLabels = selectDictLabels
+Vue.prototype.download = download
 Vue.prototype.handleTree = handleTree
 
 // 全局组件挂载
@@ -60,6 +64,7 @@ Vue.component('RightToolbar', RightToolbar)
 Vue.component('Editor', Editor)
 Vue.component('FileUpload', FileUpload)
 Vue.component('ImageUpload', ImageUpload)
+Vue.component('ImagePreview', ImagePreview)
 
 Vue.use(directive)
 Vue.use(plugins)

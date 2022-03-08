@@ -2,17 +2,19 @@ package com.ruoyi.system.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.common.constant.UserConstants;
+import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.exception.ServiceException;
-import com.ruoyi.common.utils.PageUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.domain.SysPost;
 import com.ruoyi.system.domain.SysUserPost;
 import com.ruoyi.system.mapper.SysPostMapper;
 import com.ruoyi.system.mapper.SysUserPostMapper;
 import com.ruoyi.system.service.ISysPostService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,18 +29,19 @@ import java.util.stream.Collectors;
  * @author Lion Li
  */
 @Service
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class SysPostServiceImpl extends ServicePlusImpl<SysPostMapper, SysPost, SysPost> implements ISysPostService {
 
-    @Autowired
-    private SysUserPostMapper userPostMapper;
+    private final SysUserPostMapper userPostMapper;
 
     @Override
-    public TableDataInfo<SysPost> selectPagePostList(SysPost post) {
+    public TableDataInfo<SysPost> selectPagePostList(SysPost post, PageQuery pageQuery) {
         LambdaQueryWrapper<SysPost> lqw = new LambdaQueryWrapper<SysPost>()
                 .like(StringUtils.isNotBlank(post.getPostCode()), SysPost::getPostCode, post.getPostCode())
                 .eq(StringUtils.isNotBlank(post.getStatus()), SysPost::getStatus, post.getStatus())
                 .like(StringUtils.isNotBlank(post.getPostName()), SysPost::getPostName, post.getPostName());
-        return PageUtils.buildDataInfo(page(PageUtils.buildPage(), lqw));
+        Page<SysPost> page = page(pageQuery.build(), lqw);
+        return TableDataInfo.build(page);
     }
 
     /**
@@ -83,7 +86,7 @@ public class SysPostServiceImpl extends ServicePlusImpl<SysPostMapper, SysPost, 
      * @return 选中岗位ID列表
      */
     @Override
-    public List<Integer> selectPostListByUserId(Long userId) {
+    public List<Long> selectPostListByUserId(Long userId) {
         return baseMapper.selectPostListByUserId(userId);
     }
 
@@ -110,9 +113,10 @@ public class SysPostServiceImpl extends ServicePlusImpl<SysPostMapper, SysPost, 
     @Override
     public String checkPostNameUnique(SysPost post) {
         Long postId = StringUtils.isNull(post.getPostId()) ? -1L : post.getPostId();
-        SysPost info = getOne(new LambdaQueryWrapper<SysPost>()
-                .eq(SysPost::getPostName, post.getPostName()).last("limit 1"));
-        if (StringUtils.isNotNull(info) && info.getPostId().longValue() != postId.longValue()) {
+        long count = count(new LambdaQueryWrapper<SysPost>()
+                .eq(SysPost::getPostName, post.getPostName())
+                .ne(SysPost::getPostId, postId));
+        if (count > 0) {
             return UserConstants.NOT_UNIQUE;
         }
         return UserConstants.UNIQUE;
@@ -127,9 +131,10 @@ public class SysPostServiceImpl extends ServicePlusImpl<SysPostMapper, SysPost, 
     @Override
     public String checkPostCodeUnique(SysPost post) {
         Long postId = StringUtils.isNull(post.getPostId()) ? -1L : post.getPostId();
-        SysPost info = getOne(new LambdaQueryWrapper<SysPost>()
-                .eq(SysPost::getPostCode, post.getPostCode()).last("limit 1"));
-        if (StringUtils.isNotNull(info) && info.getPostId().longValue() != postId.longValue()) {
+        long count = count(new LambdaQueryWrapper<SysPost>()
+                .eq(SysPost::getPostCode, post.getPostCode())
+                .ne(SysPost::getPostId, postId));
+        if (count > 0) {
             return UserConstants.NOT_UNIQUE;
         }
         return UserConstants.UNIQUE;

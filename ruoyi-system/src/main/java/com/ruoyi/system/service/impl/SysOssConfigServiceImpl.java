@@ -5,17 +5,18 @@ import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.collect.Lists;
 import com.ruoyi.common.constant.UserConstants;
+import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
-import com.ruoyi.common.core.page.PagePlus;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.JsonUtils;
-import com.ruoyi.common.utils.PageUtils;
 import com.ruoyi.common.utils.RedisUtils;
 import com.ruoyi.common.utils.StringUtils;
-import com.ruoyi.oss.constant.CloudConstant;
+import com.ruoyi.oss.constant.OssConstant;
+import com.ruoyi.oss.factory.OssFactory;
 import com.ruoyi.system.domain.SysOssConfig;
 import com.ruoyi.system.domain.bo.SysOssConfigBo;
 import com.ruoyi.system.domain.vo.SysOssConfigVo;
@@ -27,7 +28,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.PostConstruct;
 import java.util.Collection;
 import java.util.List;
 
@@ -46,16 +46,19 @@ public class SysOssConfigServiceImpl extends ServicePlusImpl<SysOssConfigMapper,
     /**
      * 项目启动时，初始化参数到缓存，加载配置类
      */
-    @PostConstruct
+    @Override
     public void init() {
         List<SysOssConfig> list = list();
+        // 加载OSS初始化配置
         for (SysOssConfig config : list) {
             String configKey = config.getConfigKey();
             if ("0".equals(config.getStatus())) {
-                RedisUtils.setCacheObject(CloudConstant.CACHE_CONFIG_KEY, configKey);
+                RedisUtils.setCacheObject(OssConstant.CACHE_CONFIG_KEY, configKey);
             }
             setConfigCache(true, config);
         }
+        // 初始化OSS工厂
+        OssFactory.init();
     }
 
     @Override
@@ -64,9 +67,10 @@ public class SysOssConfigServiceImpl extends ServicePlusImpl<SysOssConfigMapper,
     }
 
     @Override
-    public TableDataInfo<SysOssConfigVo> queryPageList(SysOssConfigBo bo) {
-        PagePlus<SysOssConfig, SysOssConfigVo> result = pageVo(PageUtils.buildPagePlus(), buildQueryWrapper(bo));
-        return PageUtils.buildDataInfo(result);
+    public TableDataInfo<SysOssConfigVo> queryPageList(SysOssConfigBo bo, PageQuery pageQuery) {
+        LambdaQueryWrapper<SysOssConfig> lqw = buildQueryWrapper(bo);
+        Page<SysOssConfigVo> result = pageVo(pageQuery.build(), lqw);
+        return TableDataInfo.build(result);
     }
 
 
@@ -110,7 +114,7 @@ public class SysOssConfigServiceImpl extends ServicePlusImpl<SysOssConfigMapper,
     @Override
     public Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid) {
         if (isValid) {
-            if (CollUtil.containsAny(ids, CloudConstant.SYSTEM_DATA_IDS)) {
+            if (CollUtil.containsAny(ids, OssConstant.SYSTEM_DATA_IDS)) {
                 throw new ServiceException("系统内置, 不可删除!");
             }
         }
@@ -153,7 +157,7 @@ public class SysOssConfigServiceImpl extends ServicePlusImpl<SysOssConfigMapper,
                 .set(SysOssConfig::getStatus, "1"));
         row += baseMapper.updateById(sysOssConfig);
         if (row > 0) {
-            RedisUtils.setCacheObject(CloudConstant.CACHE_CONFIG_KEY, sysOssConfig.getConfigKey());
+            RedisUtils.setCacheObject(OssConstant.CACHE_CONFIG_KEY, sysOssConfig.getConfigKey());
         }
         return row;
     }
@@ -165,7 +169,7 @@ public class SysOssConfigServiceImpl extends ServicePlusImpl<SysOssConfigMapper,
      * @return 缓存键key
      */
     private String getCacheKey(String configKey) {
-        return CloudConstant.SYS_OSS_KEY + configKey;
+        return OssConstant.SYS_OSS_KEY + configKey;
     }
 
     /**
@@ -180,7 +184,7 @@ public class SysOssConfigServiceImpl extends ServicePlusImpl<SysOssConfigMapper,
             RedisUtils.setCacheObject(
                     getCacheKey(config.getConfigKey()),
                     JsonUtils.toJsonString(config));
-            RedisUtils.publish(CloudConstant.CACHE_CONFIG_KEY, config.getConfigKey(), msg -> {
+            RedisUtils.publish(OssConstant.CACHE_CONFIG_KEY, config.getConfigKey(), msg -> {
                 log.info("发布刷新OSS配置 => " + msg);
             });
         }

@@ -1,8 +1,10 @@
 package com.ruoyi.system.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.page.TableDataInfo;
+import com.ruoyi.common.core.service.UserService;
 
 import java.util.List;
 
@@ -11,10 +13,10 @@ import java.util.List;
  *
  * @author Lion Li
  */
-public interface ISysUserService extends IService<SysUser> {
+public interface ISysUserService extends IService<SysUser>, UserService {
 
 
-    TableDataInfo<SysUser> selectPageUserList(SysUser user);
+    TableDataInfo<SysUser> selectPageUserList(SysUser user, PageQuery pageQuery);
 
     /**
      * 根据条件分页查询用户列表
@@ -30,7 +32,7 @@ public interface ISysUserService extends IService<SysUser> {
      * @param user 用户信息
      * @return 用户信息集合信息
      */
-    TableDataInfo<SysUser> selectAllocatedList(SysUser user);
+    TableDataInfo<SysUser> selectAllocatedList(SysUser user, PageQuery pageQuery);
 
     /**
      * 根据条件分页查询未分配用户角色列表
@@ -38,7 +40,7 @@ public interface ISysUserService extends IService<SysUser> {
      * @param user 用户信息
      * @return 用户信息集合信息
      */
-    TableDataInfo<SysUser> selectUnallocatedList(SysUser user);
+    TableDataInfo<SysUser> selectUnallocatedList(SysUser user, PageQuery pageQuery);
 
     /**
      * 通过用户名查询用户
@@ -46,6 +48,7 @@ public interface ISysUserService extends IService<SysUser> {
      * @param userName 用户名
      * @return 用户对象信息
      */
+    @Override
     SysUser selectUserByUserName(String userName);
 
     /**
@@ -54,6 +57,7 @@ public interface ISysUserService extends IService<SysUser> {
      * @param userId 用户ID
      * @return 用户对象信息
      */
+    @Override
     SysUser selectUserById(Long userId);
 
     /**
@@ -209,13 +213,4 @@ public interface ISysUserService extends IService<SysUser> {
      */
     int deleteUserByIds(Long[] userIds);
 
-    /**
-     * 导入用户数据
-     *
-     * @param userList        用户数据列表
-     * @param isUpdateSupport 是否更新支持，如果已存在，则进行更新数据
-     * @param operName        操作用户
-     * @return 结果
-     */
-    String importUser(List<SysUser> userList, Boolean isUpdateSupport, String operName);
 }

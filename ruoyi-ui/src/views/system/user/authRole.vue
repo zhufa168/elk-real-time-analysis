@@ -9,7 +9,7 @@
           </el-form-item>
         </el-col>
         <el-col :span="8" :offset="2">
-          <el-form-item label="登录账号" prop="phonenumber">
+          <el-form-item label="登录账号" prop="userName">
             <el-input  v-model="form.userName" disabled />
           </el-form-item>
         </el-col>
@@ -33,7 +33,7 @@
         </template>
       </el-table-column>
     </el-table>
-    
+
     <pagination v-show="total>0" :total="total" :page.sync="pageNum" :limit.sync="pageSize" />
 
     <el-form label-width="100px">
@@ -109,8 +109,8 @@ export default {
     },
     /** 关闭按钮 */
     close() {
-      this.$store.dispatch("tagsView/delView", this.$route);
-      this.$router.push({ path: "/system/user" });
+      const obj = { path: "/system/user" };
+      this.$tab.closeOpenPage(obj);
     },
   },
 };

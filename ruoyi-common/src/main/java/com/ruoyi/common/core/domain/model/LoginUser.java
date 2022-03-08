@@ -2,7 +2,8 @@ package com.ruoyi.common.core.domain.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ruoyi.common.core.domain.entity.SysUser;
-import lombok.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,7 +15,7 @@ import java.util.Set;
 /**
  * 登录用户身份权限
  *
- * @author ruoyi
+ * @author Lion Li
  */
 
 @Data
@@ -70,41 +71,36 @@ public class LoginUser implements UserDetails {
     private String os;
 
     /**
-     * 权限列表
+     * 菜单权限
      */
-    private Set<String> permissions;
+    private Set<String> menuPermissions;
 
     /**
-     * 用户信息
+     * 角色权限
      */
-    private SysUser user;
+    private Set<String> rolePermissions;
+
+    /**
+     * 用户名
+     */
+    private String username;
+
+    /**
+     * 密码
+     */
+    private String password;
 
     private List<MySimpleGrantedAuthority> authorities;
-
-    public LoginUser(SysUser user, Set<String> permissions)
-    {
-        this.user = user;
-        this.permissions = permissions;
-    }
-
-    public LoginUser(Long userId, Long deptId, SysUser user, Set<String> permissions, List<MySimpleGrantedAuthority> authorities)
-    {
-        this.userId = userId;
-        this.deptId = deptId;
-        this.user = user;
-        this.permissions = permissions;
-        this.authorities = authorities;
-    }
 
     @JsonIgnore
     @Override
     public String getPassword() {
-        return user.getPassword();
+        return password;
     }
 
     @Override
     public String getUsername() {
-        return user.getUserName();
+        return username;
     }
 
     /**
@@ -144,8 +140,7 @@ public class LoginUser implements UserDetails {
     }
 
     @Override
-    public Collection<? extends GrantedAuthority> getAuthorities()
-    {
+    public Collection<? extends GrantedAuthority> getAuthorities() {
         return null;
     }
 }

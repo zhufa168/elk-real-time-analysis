@@ -3,6 +3,7 @@ package com.ruoyi.web.controller.monitor;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.poi.ExcelUtil;
@@ -36,14 +37,14 @@ public class SysLogininforController extends BaseController {
     @ApiOperation("查询系统访问记录列表")
     @PreAuthorize("@ss.hasPermi('monitor:logininfor:list')")
     @GetMapping("/list")
-    public TableDataInfo<SysLogininfor> list(SysLogininfor logininfor) {
-        return logininforService.selectPageLogininforList(logininfor);
+    public TableDataInfo<SysLogininfor> list(SysLogininfor logininfor, PageQuery pageQuery) {
+        return logininforService.selectPageLogininforList(logininfor, pageQuery);
     }
 
     @ApiOperation("导出系统访问记录列表")
     @Log(title = "登录日志", businessType = BusinessType.EXPORT)
     @PreAuthorize("@ss.hasPermi('monitor:logininfor:export')")
-    @GetMapping("/export")
+    @PostMapping("/export")
     public void export(SysLogininfor logininfor, HttpServletResponse response) {
         List<SysLogininfor> list = logininforService.selectLogininforList(logininfor);
         ExcelUtil.exportExcel(list, "登录日志", SysLogininfor.class, response);

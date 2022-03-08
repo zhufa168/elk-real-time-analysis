@@ -73,12 +73,12 @@ public class WorkflowLeaveServiceImpl extends ServicePlusImpl<WorkflowLeaveMappe
      */
     @Override
     public List<WorkflowLeave> selectWorkflowLeaveList(WorkflowLeave workflowLeave) {
-        return baseMapper.selectWorkflowLeaveListByWorkflowLeaveAndDeptId(workflowLeave, SecurityUtils.getLoginUser().getUser().getDeptId());
+        return baseMapper.selectWorkflowLeaveListByWorkflowLeaveAndDeptId(workflowLeave, SecurityUtils.getLoginUser().getDeptId());
     }
 
     @Override
     public TableDataInfo<WorkflowLeave> selectPageWorkflowLeaveList(WorkflowLeave workflowLeave) {
-        return PageUtils.buildDataInfo(baseMapper.selectWorkflowLeaveListByWorkflowLeaveAndDeptId(PageUtils.buildPage(),workflowLeave,SecurityUtils.getLoginUser().getUser().getDeptId()));
+        return PageUtils.buildDataInfo(baseMapper.selectWorkflowLeaveListByWorkflowLeaveAndDeptId(PageUtils.buildPage(),workflowLeave,SecurityUtils.getLoginUser().getDeptId()));
     }
 
     /**
