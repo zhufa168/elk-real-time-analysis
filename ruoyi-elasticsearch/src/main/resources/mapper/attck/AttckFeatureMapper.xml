@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.elasticsearch.mapper.AttckFeatureMapper">
+
+
+    <resultMap id="FeatureResult" type="AttckFeature">
+        <id property="id"             column="id"           />
+        <result property="ckType"      column="ck_type"       />
+        <result property="code"       column="code"         />
+        <result property="status"     column="status"       />
+        <result property="rule"       column="rule"         />
+        <result property="createBy"   column="create_by"   />
+        <result property="createTime" column="create_time" />
+        <result property="updateBy"   column="update_by"   />
+        <result property="updateTime" column="update_time" />
+        <result property="remark"      column="remark" />
+    </resultMap>
+
+
+    <sql id="selectFeatureVo">
+        select  `id`, `ck_type`, `code`, `status`, rule, create_by, create_time, update_by, update_time, remark from att_ck_feature where status = 1
+    </sql>
+
+
+
+    <select id="selectAttckFeatureList" resultMap="FeatureResult">
+        <include refid="selectFeatureVo"/>
+    </select>
+
+</mapper>
