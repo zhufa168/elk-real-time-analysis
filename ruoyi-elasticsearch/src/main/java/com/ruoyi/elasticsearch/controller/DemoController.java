@@ -35,4 +35,10 @@ public class DemoController {
         Map<String, Object> ajax = new HashMap<>();
         return AjaxResult.success(ajax);
     }
+
+    @GetMapping("/queryDataList")
+    public  AjaxResult queryDataList(){
+        List list = null; //elasticService.queryIndexsDataList();
+        return AjaxResult.success(list);
+    }
 }

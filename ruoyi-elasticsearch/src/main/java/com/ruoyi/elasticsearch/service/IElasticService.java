@@ -17,4 +17,6 @@ public interface IElasticService {
     void addEsContent();
 
     List queryList();
+
+    List queryIndexsDataList(String index,String startTime,String endTime);
 }

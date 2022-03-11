@@ -3,10 +3,10 @@ package com.ruoyi.common.utils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.time.DateFormatUtils;
-
 import java.lang.management.ManagementFactory;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -26,6 +26,8 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
     public static String YYYYMMDDHHMMSS = "yyyyMMddHHmmss";
 
     public static String YYYY_MM_DD_HH_MM_SS = "yyyy-MM-dd HH:mm:ss";
+
+    public static String ISO_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
 
     private static String[] parsePatterns = {
             "yyyy-MM-dd", "yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm", "yyyy-MM",
@@ -64,6 +66,10 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
 
     public static final String dateTime(final Date date) {
         return parseDateToStr(YYYY_MM_DD, date);
+    }
+
+    public static final String getTime(final Date date) {
+        return parseDateToStr(YYYY_MM_DD_HH_MM_SS, date);
     }
 
     public static final String parseDateToStr(final String format, final Date date) {
@@ -135,5 +141,69 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
         // 计算差多少秒//输出结果
         // long sec = diff % nd % nh % nm / ns;
         return day + "天" + hour + "小时" + min + "分钟";
+    }
+
+    /**
+     *  当前日期减去多少天
+     * @param day
+     * @return
+     */
+    public static String dateCalcTime(int day){
+        Date date = new Date();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.add(Calendar.DATE,day);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(ISO_FORMAT);
+        return  simpleDateFormat.format(calendar.getTime());
+    }
+    /**
+     *  设置的日期减去多少天
+     * @param day
+     * @return
+     */
+    public static String dateCalcTime(Date date,int day){
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.add(Calendar.DATE,day);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(ISO_FORMAT);
+        return  simpleDateFormat.format(calendar.getTime());
+    }
+
+    /**
+     *  设置的日期减去多少天
+     * @param date,minute
+     * @return
+     */
+    public static String dateCalcTimeMil(Date date,int minute){
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.add(Calendar.MINUTE,minute);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(ISO_FORMAT);
+        return  simpleDateFormat.format(calendar.getTime());
+    }
+
+    /**
+     *  设置的日期减去多少天
+     * @param date
+     * @return
+     */
+    public static String dateCalcTimeMil(String date,int minute){
+        Date date1 = parseDate(date);
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date1);
+        calendar.add(Calendar.MINUTE,minute);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(ISO_FORMAT);
+        return  simpleDateFormat.format(calendar.getTime());
+    }
+
+    /**
+     *  设置的日期减去多少天
+     * @param date
+     * @return
+     */
+    public static String stringTimetoUTC(String date){
+        Date date1 = parseDate(date);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(ISO_FORMAT);
+        return  simpleDateFormat.format(date1);
     }
 }

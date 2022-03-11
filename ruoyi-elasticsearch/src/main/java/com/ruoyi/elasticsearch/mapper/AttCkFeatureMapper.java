@@ -1,11 +1,13 @@
 package com.ruoyi.elasticsearch.mapper;
 
-import com.ruoyi.common.core.mybatisplus.core.BaseMapperPlus;
-import com.ruoyi.elasticsearch.domain.model.AttCkFeature;
+import com.ruoyi.elasticsearch.domain.AttckFeature;
+import org.springframework.stereotype.Component;
 
-/**
- * @author Jayden cxp
- * date 2022-03-09
- */
-public interface AttCkFeatureMapper extends BaseMapperPlus<AttCkFeature> {
+import java.util.List;
+
+@Component
+public interface AttckFeatureMapper {
+
+    List<AttckFeature> selectAttckFeatureList();
+
 }
