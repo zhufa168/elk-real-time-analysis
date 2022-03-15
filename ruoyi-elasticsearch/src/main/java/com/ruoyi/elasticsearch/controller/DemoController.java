@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +31,7 @@ public class DemoController {
     }
 
     @GetMapping("/queryAllIndex")
-    public AjaxResult<Map<String, Object>> queryAllIndex() {
+    public AjaxResult<Map<String, Object>> queryAllIndex() throws IOException {
         List list = elasticService.queryIndex("winlog*");
         Map<String, Object> ajax = new HashMap<>();
         return AjaxResult.success(ajax);

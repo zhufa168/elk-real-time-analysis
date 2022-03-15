@@ -62,4 +62,9 @@ public class AttCkFeature extends BaseEntity {
     @ExcelProperty(value = "规则")
     private String rule;
 
+    /** 备注 */
+    @TableField(value = "remark")
+    @ApiModelProperty(value = "备注")
+    private String remark;
+
 }

@@ -5,7 +5,7 @@
 <mapper namespace="com.ruoyi.elasticsearch.mapper.AttckFeatureMapper">
 
 
-    <resultMap id="FeatureResult" type="AttckFeature">
+    <resultMap id="FeatureResult" type="AttCkFeature">
         <id property="id"             column="id"           />
         <result property="ckType"      column="ck_type"       />
         <result property="code"       column="code"         />

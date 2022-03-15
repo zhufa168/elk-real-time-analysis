@@ -52,6 +52,10 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
         return dateTimeNow(YYYY_MM_DD);
     }
 
+    public static String getDate(String ts) {
+        return parseDateToStr(YYYY_MM_DD,parseDate(ts));
+    }
+
     public static final String getTime() {
         return dateTimeNow(YYYY_MM_DD_HH_MM_SS);
     }
@@ -201,9 +205,51 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
      * @param date
      * @return
      */
+    public static long dateCalcTimeStamp(Date date,int minute){
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.add(Calendar.MINUTE,minute);
+        return  calendar.getTimeInMillis();
+    }
+
+    /**
+     *  设置的日期减去多少天
+     * @param date
+     * @return
+     */
+    public static String getdateCalcTimeMil(String date,int minute){
+        Date date1 = parseDate(date);
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date1);
+        calendar.add(Calendar.MINUTE,minute);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(YYYY_MM_DD_HH_MM_SS);
+        return  simpleDateFormat.format(calendar.getTime());
+    }
+
+    /**
+     *  设置的日期减去多少天
+     * @param date
+     * @return
+     */
     public static String stringTimetoUTC(String date){
         Date date1 = parseDate(date);
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(ISO_FORMAT);
         return  simpleDateFormat.format(date1);
     }
+    
+    
+    public static boolean differentDays(Date startDate,Date endDate){
+        Calendar cal1 = Calendar.getInstance();
+        cal1.setTime(startDate);
+        Calendar cal2 = Calendar.getInstance();
+        cal2.setTime(endDate);
+        int day1= cal1.get(Calendar.DAY_OF_YEAR);
+        int day2 = cal2.get(Calendar.DAY_OF_YEAR);
+        //不是同一天
+        if(day1 != day2) return true;
+        return false;
+    }
+    
+
+    
 }

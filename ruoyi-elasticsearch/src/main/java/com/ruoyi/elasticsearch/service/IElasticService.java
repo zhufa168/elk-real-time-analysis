@@ -1,5 +1,6 @@
 package com.ruoyi.elasticsearch.service;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -12,11 +13,13 @@ public interface IElasticService {
 
     void deleteIndex(String index);
 
-    List queryIndex(String name);
+    List queryIndex(String name) throws IOException;
 
     void addEsContent();
 
     List queryList();
 
-    List queryIndexsDataList(String index,String startTime,String endTime);
+    boolean queryIndexsDataList(String index,String startTime,String endTime);
+
+    void createAlert(List<String> alertList) throws IOException;
 }
