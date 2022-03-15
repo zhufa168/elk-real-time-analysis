@@ -166,10 +166,11 @@ export const dynamicRoutes = [
     path: '/activity/bpmn',
     component: Layout,
     hidden: true,
+    permissions: ['activiti:modeler:add'],
     children: [
       {
         path: 'index',
-        component: (resolve) => require(['@/views/activiti/bpmn/index'], resolve),
+        component: () => import('@/views/activiti/bpmn/index'),
         name: 'Bpmn',
         meta: {title: '流程设计', activeMenu: '/activiti/definition'}
       }
