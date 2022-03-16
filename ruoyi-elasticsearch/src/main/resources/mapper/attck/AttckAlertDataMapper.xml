@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.elasticsearch.mapper.AttckAlertDataMapper">
+
+
+
+    <insert id="insertAlartData" parameterType="java.util.List">
+        INSERT INTO t_alert_data(`code`, event_id,indexName, message, `status`, create_time, update_time, create_by, update_by)
+        VALUES
+       <foreach collection="list" index="index" item="item" separator="," >
+           (#{item.code}, #{item.event_id}, #{item.indexName}, #{item.message} , #{item.status}, #{item.createTime}, #{item.updateTime}, #{item.createBy},#{item.updateBy})
+       </foreach>
+    </insert>
+
+</mapper>

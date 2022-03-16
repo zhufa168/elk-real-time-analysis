@@ -5,6 +5,7 @@ import com.ruoyi.common.constant.RedisKeyConstants;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.elasticsearch.domain.SystemLog;
+import com.ruoyi.elasticsearch.domain.model.TAlertData;
 import com.ruoyi.elasticsearch.domain.vo.FeatureData;
 import com.ruoyi.elasticsearch.domain.vo.FieldData;
 import com.ruoyi.elasticsearch.service.IElasticService;
@@ -32,10 +33,14 @@ import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilde
 import org.springframework.data.redis.core.DefaultTypedTuple;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -51,11 +56,13 @@ public class ElasticServiceImpl implements IElasticService {
 
     private final RestHighLevelClient restHighLevelClient;
 
-    @Autowired
-    private  AttckServiceImpl attckService;
+    private final  AttckServiceImpl attckService;
 
-    @Autowired
-    private RedisTemplate<String,String> redisTemplate;
+    private final RedisTemplate<String,String> redisTemplate;
+
+    private final AlertDataServiceImpl alertDataService;
+
+    private final ThreadPoolTaskExecutor threadPoolTaskExecutor;
 
     @Override
     public void createIndex() {
@@ -112,10 +119,7 @@ public class ElasticServiceImpl implements IElasticService {
     @Override
     public boolean queryIndexsDataList(String index,String startTime,String endTime){
         boolean flag = true;
-
         List<FeatureData> orRulesList = attckService.getfeatureDataList();
-
-
         List<String> list = null;
         try {
             list = queryIndex(index);
@@ -124,33 +128,53 @@ public class ElasticServiceImpl implements IElasticService {
             flag = false;
         }
         if(list != null && list.size()>0){
+            List<Future<Boolean>> flagList = new ArrayList(list.size());
             list.forEach(e ->{
-                try {
-                    int from = 0;
-                    int size = 500;
-                    org.elasticsearch.search.SearchHits hits = searchIndexDate(e,startTime,endTime,orRulesList,from,size);
-                    dealResult(e,hits);
-                    long totalHits = hits.getTotalHits().value;
-                    long pageIndex = 0;
-                    if(totalHits>0){
-                        if(totalHits%size>0){
-                            pageIndex = (totalHits/size)+1;
-                        }else{
-                            pageIndex = (totalHits/size);
+                Callable<Boolean> callable =()-> {
+                    boolean finish = true;
+                    try {
+                        int from = 0;
+                        int size = 500;
+                        org.elasticsearch.search.SearchHits hits = searchIndexDate(e,startTime,endTime,orRulesList,from,size);
+                        dealResult(e,hits);
+                        long totalHits = hits.getTotalHits().value;
+                        long pageIndex = 0;
+                        if(totalHits>0){
+                            if(totalHits%size>0){
+                                pageIndex = (totalHits/size)+1;
+                            }else{
+                                pageIndex = (totalHits/size);
+                            }
                         }
-                    }
-                    if(pageIndex>1){
-                        for(int i = 1 ;i<=pageIndex;i++){
-                            from = i*size;
-                            hits = searchIndexDate(e,startTime,endTime,orRulesList,from,size);
-                            dealResult(e,hits);
+                        if(pageIndex>1){
+                            for(int i = 1 ;i<=pageIndex;i++){
+                                from = i*size;
+                                hits = searchIndexDate(e,startTime,endTime,orRulesList,from,size);
+                                dealResult(e,hits);
+                            }
                         }
+                    } catch (IOException e1) {
+                        finish = false;
+                        log.error("执行出错！！",e1);
                     }
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-
-                }
+                    return finish;
+                };
+                Future<Boolean> future = threadPoolTaskExecutor.submit(callable);
+                flagList.add(future);
             });
+
+            for(Future<Boolean> future:flagList){
+                try {
+                    flag = future.get();
+                    if(!flag) break;
+                } catch (InterruptedException e) {
+                    flag = false;
+                    e.printStackTrace();
+                } catch (ExecutionException e) {
+                    flag = false;
+                    e.printStackTrace();
+                }
+            }
         }
         return flag;
     }
@@ -245,6 +269,7 @@ public class ElasticServiceImpl implements IElasticService {
         Set<ZSetOperations.TypedTuple<String>> tuples = new HashSet<>();
         for (org.elasticsearch.search.SearchHit hit : hits.getHits()) {
             Map<String, Object> map = hit.getSourceAsMap();
+            map.put("indexName",indexName);
             //bulkRequest.add(new IndexRequest("winlog_test").opType(DocWriteRequest.OpType.CREATE).source(map, XContentType.JSON));
             DefaultTypedTuple typedTuple = new DefaultTypedTuple(JSONObject.toJSON(map).toString(), Double.valueOf(date.getTime()));
             tuples.add(typedTuple);
@@ -252,6 +277,7 @@ public class ElasticServiceImpl implements IElasticService {
         if(tuples.size() > 0){
             aLong = redisTemplate.opsForZSet().add(RedisKeyConstants.ELASTIC_DATE + DateUtils.getDate() + ":" + indexName, tuples);
             redisTemplate.expire(RedisKeyConstants.ELASTIC_DATE + DateUtils.getDate() + ":" + indexName,24*3600, TimeUnit.SECONDS);
+
         }
         /*try {
             int size = bulkRequest.requests().size();
@@ -259,6 +285,7 @@ public class ElasticServiceImpl implements IElasticService {
         } catch (IOException e) {
             e.printStackTrace();
         }*/
+        log.info(DateUtils.getTime()+"生成数据第一个次过滤条数："+aLong+ " 条");
         return aLong;
     }
 
@@ -293,7 +320,7 @@ public class ElasticServiceImpl implements IElasticService {
     public void createAlert(List<String> alertList) throws IOException{
 
         List<Map<String, String>> orRulesList = attckService.createOrRulesList();
-
+        List<TAlertData> alertDataList = new ArrayList<>();
         if(alertList.size() > 0){
             alertList.forEach(e->{
                 JSONObject jsonObject = JSONObject.parseObject(e);
@@ -301,7 +328,7 @@ public class ElasticServiceImpl implements IElasticService {
                     FeatureData featureData = null;
                     String attckType= null;
                     Iterator<Map.Entry<String, String>> iterator = v.entrySet().iterator();
-                    if(iterator.hasNext()){
+                    while (iterator.hasNext()){
                         Map.Entry<String, String> next = iterator.next();
                         if(next.getKey().equals("rule")) featureData = JSONObject.parseObject(next.getValue(),FeatureData.class);
                         if(next.getKey().equals("attckType")) attckType = next.getValue();
@@ -309,11 +336,26 @@ public class ElasticServiceImpl implements IElasticService {
                     String rule = parseRule(featureData, jsonObject, "");
                     boolean flag = NumberCalc.calc(rule);
                     if(flag){
-                        jsonObject.put("attckType",attckType);
-                        redisTemplate.opsForValue().set("alert:data:"+DateUtils.getDate()+":"+jsonObject.getString("uuid"),jsonObject.toString());
+                        //jsonObject.put("attckType",attckType);
+                        //redisTemplate.opsForValue().set("alert:data:"+DateUtils.getDate()+":"+jsonObject.getString("uuid"),jsonObject.toString());
+                        TAlertData tAlertData = new TAlertData();
+                        tAlertData.setCode(attckType);
+                        tAlertData.setEvent_id(jsonObject.getString("uuid"));
+                        tAlertData.setMessage(jsonObject.getString("message"));
+                        tAlertData.setIndexName(StringUtils.isEmpty(jsonObject.getString("indexName"))?"":jsonObject.getString("indexName"));
+                        tAlertData.setStatus(1);
+                        tAlertData.setUpdateTime(new Date());
+                        tAlertData.setCreateTime(new Date());
+                        tAlertData.setCreateBy("admin");
+                        tAlertData.setUpdateBy("admin");
+                        alertDataList.add(tAlertData);
                     }
                 });
             });
+        }
+        if(alertDataList.size()>0){
+            int i = alertDataService.insertAll(alertDataList);
+            log.info("============》成功插入告警数据 : "+i + " 条 《============");
         }
     }
 

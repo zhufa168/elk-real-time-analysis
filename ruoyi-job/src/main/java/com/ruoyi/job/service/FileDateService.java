@@ -53,7 +53,7 @@ public class FileDateService {
             boolean oldFlag = elasticService.queryIndexsDataList(oldIndex, endTimeUTC, DateUtils.stringTimetoUTC(last_time));
 
             //第二段处理
-            String newStartTime = DateUtils.getDate()+ " 00:00:01";
+            String newStartTime = DateUtils.getDate()+ " 00:00:00";
             String newIndex = RedisKeyConstants.PRE_INDEX +DateUtils.getDate()+"_*";
             newIndex = newIndex.replace("-",".");
 
@@ -62,7 +62,6 @@ public class FileDateService {
         }else{
             String index = RedisKeyConstants.PRE_INDEX +DateUtils.dateTime(DateUtils.parseDate(nowTimeStr))+"_*";
             index = index.replace("-",".");
-            log.info("index:"+index + "  startTime："+endTimeUTC + " endTime："+nowTimeUTC);
             boolean flag = elasticService.queryIndexsDataList(index, endTimeUTC, nowTimeUTC);
             if(flag) redisTemplate.opsForValue().set(RedisKeyConstants.FILTER_KEY, nowTimeStr);
         }
@@ -77,12 +76,14 @@ public class FileDateService {
             beforeDate = redisTemplate.opsForValue().get(RedisKeyConstants.ALART_BEFORE_DATE);
         }else{
             beforeDate = DateUtils.getDate();
-            redisTemplate.opsForValue().set(RedisKeyConstants.ALART_BEFORE_DATE,beforeDate);
+            redisTemplate.opsForValue().set(RedisKeyConstants.ALART_BEFORE_DATE,beforeDate,24 * 3600,TimeUnit.SECONDS);
         }
         log.error(DateUtils.getTime()+":winlog告警生成开始！！！");
         //判断是否同一天
         if(DateUtils.differentDays(DateUtils.parseDate(beforeDate),date)){
             this.createAlart(beforeDate);
+            beforeDate = DateUtils.getDate();
+            redisTemplate.opsForValue().set(RedisKeyConstants.ALART_BEFORE_DATE,beforeDate,24 * 3600,TimeUnit.SECONDS);
         }
         this.createAlart(DateUtils.getDate());
         log.info(DateUtils.getTime()+":winlog告警生成成功！！！");

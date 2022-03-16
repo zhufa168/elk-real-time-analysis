@@ -44,9 +44,9 @@ public class AttckServiceImpl implements IAttckService {
         map1.put("rule",json);
         map1.put("attckType","TT001");
         map2.put("rule",json1);
-        map1.put("attckType","TT002");
+        map2.put("attckType","TT002");
         map3.put("rule",json2);
-        map1.put("attckType","TT003");
+        map3.put("attckType","TT003");
         featureDataList.add(map1);
         featureDataList.add(map2);
         featureDataList.add(map3);
