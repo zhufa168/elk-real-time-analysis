@@ -3,7 +3,7 @@ package com.ruoyi.elasticsearch.service.impl;
 import com.alibaba.fastjson.JSONObject;
 import com.ruoyi.elasticsearch.domain.model.AttCkFeature;
 import com.ruoyi.elasticsearch.domain.vo.FeatureData;
-import com.ruoyi.elasticsearch.mapper.AttckFeatureMapper;
+import com.ruoyi.elasticsearch.mapper.AttCkFeatureMapper;
 import com.ruoyi.elasticsearch.service.IAttckService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,7 +14,7 @@ import java.util.*;
 public class AttckServiceImpl implements IAttckService {
 
     @Autowired
-    private  AttckFeatureMapper attckFeatureMapper;
+    private  AttCkFeatureMapper attckFeatureMapper;
 
     private static List<AttCkFeature> attckFeatureList =  null;
 
