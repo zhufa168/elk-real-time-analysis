@@ -185,6 +185,8 @@ insert into sys_menu values('118',  '文件管理', '1', '10', 'oss', 'system/os
 insert into sys_menu values('120',  '任务调度中心', '2',  '5', 'XxlJob',      'monitor/xxljob/index',      '', 1, 0, 'C', '0', '0', 'monitor:xxljob:list',      'job',     'admin', sysdate(), '', null, 'Xxl-Job控制台菜单');
 -- 流程定义
 insert into sys_menu values('121', '流程定义', '4', '1', 'definition', 'activiti/definition/index',    '', 1, 0, 'C', '0', '0', 'activiti:modeler',          '#', 'admin', sysdate(), '', NULL, '流程定义菜单');
+-- 数据源
+insert into sys_menu values('122', '数据源管理', '1', '1', 'datasource', 'system/datasource/index',    '', 1, 0, 'C', '0', '0', 'system:datasource:list', '#', 'admin', sysdate(), '', null, '数据源管理');
 
 
 -- 三级菜单
@@ -265,7 +267,12 @@ insert into sys_menu values('1604', '配置添加', '118', '5', '#', '', '', 1, 
 insert into sys_menu values('1605', '配置编辑', '118', '6', '#', '', '', 1, 0, 'F', '0', '0', 'system:oss:edit',         '#', 'admin', sysdate(), '', null, '');
 -- 流程相关按钮
 
-
+-- 数据源管理相关按钮
+insert into sys_menu values('1610','数据源查询', '122', '1',  '#', '','', 1, 0, 'F', '0', '0', 'system:datasource:query',        '#', 'admin', sysdate(), '', null, '');
+insert into sys_menu values('1611','数据源新增', '122', '2',  '#', '','', 1, 0, 'F', '0', '0', 'system:datasource:add',          '#', 'admin', sysdate(), '', null, '');
+insert into sys_menu values('1612','数据源修改', '122', '3',  '#', '','', 1, 0, 'F', '0', '0', 'system:datasource:edit',         '#', 'admin', sysdate(), '', null, '');
+insert into sys_menu values('1613','数据源删除', '122', '4',  '#', '','', 1, 0, 'F', '0', '0', 'system:datasource:remove',       '#', 'admin', sysdate(), '', null, '');
+insert into sys_menu values('1614','数据源导出', '122', '5',  '#', '','', 1, 0, 'F', '0', '0', 'system:datasource:export',       '#', 'admin', sysdate(), '', null, '');
 
 -- ----------------------------
 -- 6、用户和角色关联表  用户N-1角色
