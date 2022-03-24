@@ -1,9 +1,16 @@
 package com.ruoyi.system.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.baomidou.dynamic.datasource.DynamicRoutingDataSource;
+import com.baomidou.dynamic.datasource.creator.DefaultDataSourceCreator;
+import com.baomidou.dynamic.datasource.spring.boot.autoconfigure.DataSourceProperty;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.core.domain.PageQuery;
+import com.ruoyi.system.convert.SysDatasourceConvert;
+import lombok.RequiredArgsConstructor;
+import lombok.val;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ruoyi.common.core.mybatisplus.core.ServicePlusImpl;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -14,7 +21,9 @@ import com.ruoyi.system.domain.vo.SysDatasourceVo;
 import com.ruoyi.system.domain.SysDatasource;
 import com.ruoyi.system.mapper.SysDatasourceMapper;
 import com.ruoyi.system.service.ISysDatasourceService;
+import org.springframework.validation.annotation.Validated;
 
+import javax.sql.DataSource;
 import java.util.List;
 import java.util.Map;
 import java.util.Collection;
@@ -25,8 +34,13 @@ import java.util.Collection;
  * @author ruoyi
  * @date 2022-03-17
  */
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
 @Service
 public class SysDatasourceServiceImpl extends ServicePlusImpl<SysDatasourceMapper, SysDatasource, SysDatasourceVo> implements ISysDatasourceService {
+
+    private final DynamicRoutingDataSource DynamicRoutingDataSource;
+
+    private final DefaultDataSourceCreator dataSourceCreator;
 
     @Override
     public SysDatasourceVo queryById(Long datasourceId){
@@ -96,5 +110,40 @@ public class SysDatasourceServiceImpl extends ServicePlusImpl<SysDatasourceMappe
             //TODO 做一些业务上的校验,判断是否需要校验
         }
         return removeByIds(ids);
+    }
+
+    @Override
+    public Boolean createDataSource(SysDatasourceBo bo){
+        if(bo == null){
+            return false;
+        }
+        DataSourceProperty dataSourceProperty = SysDatasourceConvert.INSTANCE.convert(bo);
+        DataSource dataSource = dataSourceCreator.createDataSource(dataSourceProperty);
+        DynamicRoutingDataSource.addDataSource(bo.getName(),dataSource);
+        return true;
+    }
+
+    @Override
+    public Boolean removeDataSource(String key){
+        if(key == null){
+            return false;
+        }
+        DynamicRoutingDataSource.removeDataSource(key);
+        return true;
+    }
+
+    @Override
+    public Boolean updateDataSource(SysDatasourceBo bo) {
+        return removeDataSource(bo.getName()) &&  createDataSource(bo);
+    }
+
+
+    @Override
+    public void loadingDataSource() {
+        List<SysDatasourceVo> list = queryList(new SysDatasourceBo());
+        for(SysDatasourceVo vo : list){
+            SysDatasourceBo bo = SysDatasourceConvert.INSTANCE.convert(vo);
+            createDataSource(bo);
+        }
     }
 }

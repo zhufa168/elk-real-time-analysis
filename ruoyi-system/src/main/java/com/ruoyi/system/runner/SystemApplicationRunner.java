@@ -2,6 +2,7 @@ package com.ruoyi.system.runner;
 
 import com.ruoyi.common.config.RuoYiConfig;
 import com.ruoyi.system.service.ISysConfigService;
+import com.ruoyi.system.service.ISysDatasourceService;
 import com.ruoyi.system.service.ISysDictTypeService;
 import com.ruoyi.system.service.ISysOssConfigService;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,8 @@ public class SystemApplicationRunner implements ApplicationRunner {
     private final ISysConfigService configService;
     private final ISysDictTypeService dictTypeService;
     private final ISysOssConfigService ossConfigService;
+    private final ISysDatasourceService datasourceService;
+
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
@@ -37,6 +40,8 @@ public class SystemApplicationRunner implements ApplicationRunner {
         log.info("加载参数缓存数据成功");
         dictTypeService.loadingDictCache();
         log.info("加载字典缓存数据成功");
+        datasourceService.loadingDataSource();
+        log.info("加载数据源成功");
     }
 
 }

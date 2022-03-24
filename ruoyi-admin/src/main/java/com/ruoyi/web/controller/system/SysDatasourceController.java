@@ -70,22 +70,23 @@ public class SysDatasourceController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:datasource:list')")
     @GetMapping("/list")
     public TableDataInfo<SysDatasourceVo> list(@Validated(QueryGroup.class) SysDatasourceBo bo, PageQuery pageQuery) {
-        List<SysDatasourceVo> list = new ArrayList<>();
-        DynamicRoutingDataSource ds = (DynamicRoutingDataSource) dataSource;
-        Map<String, DataSource> dataSources = ds.getDataSources();
-        for (Map.Entry<String, DataSource> entry : dataSources.entrySet()) {
-            SysDatasourceVo vo = new SysDatasourceVo();
-            ItemDataSource source = (ItemDataSource)entry.getValue();
-            DruidDataSource druidDataSource = (DruidDataSource) source.getRealDataSource();
-            vo.setName(entry.getKey());
-            vo.setUrl(druidDataSource.getUrl());
-            vo.setUsername(druidDataSource.getUsername());
-            vo.setPassword(druidDataSource.getPassword());
-            vo.setDsType(druidDataSource.getDriverClassName());
-            vo.setConfType(druidDataSource.getDbType());
-            list.add(vo);
-        }
-        return TableDataInfo.build(list);
+//        List<SysDatasourceVo> list = new ArrayList<>();
+//        TableDataInfo dataSourceList = iSysDatasourceService.queryPageList(bo, pageQuery);
+//        DynamicRoutingDataSource ds = (DynamicRoutingDataSource) dataSource;
+//        Map<String, DataSource> dataSources = ds.getDataSources();
+//        for (Map.Entry<String, DataSource> entry : dataSources.entrySet()) {
+//            SysDatasourceVo vo = new SysDatasourceVo();
+//            ItemDataSource source = (ItemDataSource)entry.getValue();
+//            DruidDataSource druidDataSource = (DruidDataSource) source.getRealDataSource();
+//            vo.setName(entry.getKey());
+//            vo.setUrl(druidDataSource.getUrl());
+//            vo.setUsername(druidDataSource.getUsername());
+//            vo.setPassword(druidDataSource.getPassword());
+//            vo.setDsType(druidDataSource.getDriverClassName());
+//            vo.setConfType(druidDataSource.getDbType());
+//            list.add(vo);
+//        }
+        return iSysDatasourceService.queryPageList(bo, pageQuery);
 //        return iSysDatasourceService.queryPageList(bo, pageQuery);
     }
 
@@ -108,8 +109,8 @@ public class SysDatasourceController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:datasource:query')")
     @GetMapping("/{datasourceId}")
     public AjaxResult<SysDatasourceVo> getInfo(@ApiParam("主键")
-                                                  @NotNull(message = "主键不能为空")
-                                                  @PathVariable("datasourceId") Long datasourceId) {
+                                               @NotNull(message = "主键不能为空")
+                                               @PathVariable("datasourceId") Long datasourceId) {
         return AjaxResult.success(iSysDatasourceService.queryById(datasourceId));
     }
 
@@ -126,10 +127,11 @@ public class SysDatasourceController extends BaseController {
         if (ds.getDataSources().keySet().contains(bo.getName())) {
             return error("数据源已经存在！");
         }
-        DataSourceProperty dataSourceProperty = SysDatasourceConvert.INSTANCE.convert(bo);
-        DataSource dataSource = dataSourceCreator.createDataSource(dataSourceProperty);
-        ds.addDataSource(bo.getName(),dataSource);
-        return success("数据源新增成功");
+        iSysDatasourceService.createDataSource(bo);
+//        DataSourceProperty dataSourceProperty = SysDatasourceConvert.INSTANCE.convert(bo);
+//        DataSource dataSource = dataSourceCreator.createDataSource(dataSourceProperty);
+//        ds.addDataSource(bo.getName(),dataSource);
+        return toAjax(iSysDatasourceService.insertByBo(bo));
 //        return toAjax(iSysDatasourceService.insertByBo(bo) ? 1 : 0);
     }
 
@@ -142,6 +144,7 @@ public class SysDatasourceController extends BaseController {
     @RepeatSubmit()
     @PutMapping()
     public AjaxResult<Void> edit(@Validated(EditGroup.class) @RequestBody SysDatasourceBo bo) {
+        iSysDatasourceService.updateDataSource(bo);
         return toAjax(iSysDatasourceService.updateByBo(bo) ? 1 : 0);
     }
 
@@ -153,8 +156,12 @@ public class SysDatasourceController extends BaseController {
     @Log(title = "数据源删除" , businessType = BusinessType.DELETE)
     @DeleteMapping("/{datasourceIds}")
     public AjaxResult<Void> remove(@ApiParam("主键串")
-                                       @NotEmpty(message = "主键不能为空")
-                                       @PathVariable Long[] datasourceIds) {
+                                   @NotEmpty(message = "主键不能为空")
+                                   @PathVariable Long[] datasourceIds) {
+        for (Long datasourceId : datasourceIds){
+            SysDatasourceVo vo = iSysDatasourceService.queryById(datasourceId);
+            iSysDatasourceService.removeDataSource(vo.getName());
+        }
         return toAjax(iSysDatasourceService.deleteWithValidByIds(Arrays.asList(datasourceIds), true) ? 1 : 0);
     }
 }

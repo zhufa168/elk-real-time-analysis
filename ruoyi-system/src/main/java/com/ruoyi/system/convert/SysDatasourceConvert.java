@@ -33,4 +33,6 @@ public interface SysDatasourceConvert {
         @Mapping(target = "password", source = "password")
     })
     DataSourceProperty convert(SysDatasourceBo bo);
+
+    SysDatasourceBo convert(SysDatasourceVo vo);
 }

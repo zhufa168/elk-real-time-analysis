@@ -54,4 +54,19 @@ public interface ISysDatasourceService extends IServicePlus<SysDatasource, SysDa
 	 * @return
 	 */
 	Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid);
+
+    /**
+     * 创建数据源链接
+     * @param bo 数据源实体类
+     * @return
+     */
+	Boolean createDataSource(SysDatasourceBo bo);
+
+
+	Boolean removeDataSource(String key);
+
+
+	Boolean updateDataSource(SysDatasourceBo bo);
+
+	void loadingDataSource();
 }

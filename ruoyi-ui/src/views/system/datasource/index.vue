@@ -171,7 +171,7 @@
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="数据源名称" prop="name">
-          <el-input v-model="form.name" placeholder="请输入别名" />
+          <el-input v-model="form.name" placeholder="请输入别名" v-bind:disabled="disabledName" />
         </el-form-item>
         <el-form-item label="链接" prop="url">
           <el-input v-model="form.url" placeholder="请输入jdbcurl" />
@@ -182,7 +182,7 @@
         <el-form-item label="密码" prop="password">
           <el-input v-model="form.password" placeholder="请输入密码" />
         </el-form-item>
-        <el-form-item label="驱动" prop="dsName">
+        <el-form-item label="驱动" prop="dsType">
           <el-input v-model="form.dsType" placeholder="请输入驱动" />
         </el-form-item>
 <!--        <el-form-item label="实例" prop="instance">-->
@@ -230,6 +230,7 @@ export default {
       title: "",
       // 是否显示弹出层
       open: false,
+      disabledName: false,
       // 查询参数
       queryParams: {
         pageNum: 1,
@@ -328,19 +329,21 @@ export default {
     /** 新增按钮操作 */
     handleAdd() {
       this.reset();
+      this.disabledName = false;
       this.open = true;
       this.title = "添加数据源";
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
-      this.loading = true;
       this.reset();
-      const datasourceId = row.datasourceId || this.ids
+      this.disabledName = true;
+      const datasourceId = row.datasourceId;
+      console.log(datasourceId);
       getDatasource(datasourceId).then(response => {
         this.loading = false;
         this.form = response.data;
         this.open = true;
-        this.title = "修改【请填写功能名称】";
+        this.title = "修改数据源";
       });
     },
     /** 提交按钮 */
