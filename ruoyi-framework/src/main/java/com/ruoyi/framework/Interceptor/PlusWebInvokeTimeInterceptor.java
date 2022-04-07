@@ -1,4 +1,4 @@
-package com.ruoyi.framework.interceptor;
+package com.ruoyi.framework.Interceptor;
 
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.map.MapUtil;

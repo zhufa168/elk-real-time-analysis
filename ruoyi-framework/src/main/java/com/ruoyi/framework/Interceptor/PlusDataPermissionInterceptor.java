@@ -1,4 +1,4 @@
-package com.ruoyi.framework.interceptor;
+package com.ruoyi.framework.Interceptor;
 
 import com.baomidou.mybatisplus.core.plugins.InterceptorIgnoreHelper;
 import com.baomidou.mybatisplus.core.toolkit.PluginUtils;
