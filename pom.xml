@@ -43,7 +43,7 @@
         <!-- OSS 配置 -->
         <qiniu.version>7.9.0</qiniu.version>
         <aliyun.oss.version>3.13.1</aliyun.oss.version>
-        <qcloud.cos.version>5.6.58</qcloud.cos.version>
+        <qcloud.cos.version>5.6.110</qcloud.cos.version>
         <minio.version>8.3.4</minio.version>
 
         <!-- docker 配置 -->
