@@ -10,7 +10,7 @@
 	<packaging>jar</packaging>
 
 	<properties>
-		<mybatis-spring-boot-starter.version>2.1.4</mybatis-spring-boot-starter.version>
+		<mybatis-spring-boot-starter.version>2.3.1</mybatis-spring-boot-starter.version>
 		<mysql-connector-java.version>8.0.23</mysql-connector-java.version>
 	</properties>
 
