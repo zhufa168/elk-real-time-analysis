@@ -46,7 +46,7 @@
     "file-saver": "2.0.5",
     "fuse.js": "6.4.3",
     "highlight.js": "^10.5.0",
-    "js-beautify": "1.13.0",
+    "js-beautify": "1.14.10",
     "js-cookie": "3.0.1",
     "jsencrypt": "3.2.1",
     "min-dash": "^3.5.2",
