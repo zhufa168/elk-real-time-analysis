@@ -22,8 +22,8 @@
         <druid.version>1.2.8</druid.version>
         <knife4j.version>3.0.3</knife4j.version>
         <swagger-annotations.version>1.5.22</swagger-annotations.version>
-        <poi.version>4.1.2</poi.version>
-        <easyexcel.version>2.2.11</easyexcel.version>
+        <poi.version>5.4.0</poi.version>
+        <easyexcel.version>3.1.0</easyexcel.version>
         <cglib.version>3.3.0</cglib.version>
         <velocity.version>2.3</velocity.version>
         <mybatis-plus.version>3.4.3.4</mybatis-plus.version>
